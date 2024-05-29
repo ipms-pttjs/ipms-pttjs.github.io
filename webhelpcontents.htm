@@ -1,0 +1,404 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<title>Manual IPMS</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css"> 
+<!-- 
+.selected {font-weight: normal;background-color: #E2E2E2;padding:0px,2px,0px,2px;}
+.unselected { font-weight: normal;padding:0px,2px,0px,2px;}
+.hand { cursor: hand; }
+.p {height: 16px;width: 16px;vertical-align: middle;border: 0;}
+div,body { font-family: Tahoma, Verdana; font-size: 11px; }
+A:link {text-decoration: none; color:#000000}
+A:visited {text-decoration: none; color: #000000}
+A:active {text-decoration: none; color: #000000 }
+A:hover {text-decoration: none; color: #FF0000 }
+
+-->
+</style>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+var cl,pn,pm,bl;
+var path = 'icons/';
+var pos = 0;
+var icon;
+var tar = 'content';
+var display;
+var imgi;
+var AutoCollapse;
+var LastSelected = -1;
+var loaded = false;
+var max;
+var divlist;
+
+function SetEnv(v,a){
+
+if(v==0){ 
+	pn = [['daplus.gif','daminus.gif'],['tplus.gif','tminus.gif'],['uaplus.gif','uaminus.gif'],['splus.gif','sminus.gif']];
+	PreloadImg('downangle.gif','tshaped.gif','upangle.gif','sline.gif','daplus.gif','daminus.gif','tplus.gif','tminus.gif','uaplus.gif','uaminus.gif','splus.gif','sminus.gif','blank.gif','line.gif');
+}else{
+	pn = [['plus.gif','minus.gif']];
+	PreloadImg('plus.gif','minus.gif','blank.gif');
+
+}
+AutoCollapse = a;
+}
+
+ function PreloadImg(){
+if (document.images) { 
+	var imgs = PreloadImg.arguments; 
+	var pload = new Array();
+	for (var i=0; i<imgs.length; i++) { 
+		pload[i] = new Image; 
+		pload[i].src = path + imgs[i]; 
+	} 
+} 
+ } 
+
+function get(o){
+var x;
+if(document.all) x=document.all[o]; 
+if(document.getElementById) x=document.getElementById(o);
+
+return x;
+}
+
+
+function pnImg(img){
+var i,j;
+for(i=0;i<=3;i++){
+	for(j=0;j<=1;j++){
+	if(img.substr(img.lastIndexOf('/') + 1)== pn[i][j]){
+		return i;
+	}
+	}
+}
+}
+function icon(img){
+var f;
+f = img.substr(img.lastIndexOf('/') + 1);
+if( f=='1.gif' || f=='2.gif'){
+	return ['1.gif','2.gif'];
+}
+if( f=='3.gif' || f=='4.gif'){
+	return ['3.gif','4.gif'];
+}
+if( f=='5.gif' || f=='6.gif'){
+	return ['5.gif','6.gif'];
+}
+if( f=='7.gif' || f=='8.gif'){
+	return ['7.gif','8.gif'];
+}
+return [f,f];
+}
+
+function show(id){
+get('d' + id).style.display='block';
+if(get('imgn' + id )) get('imgn' + id ).src= path + pn[pnImg(get('imgn' + id ).src)][1];
+get('img' + id ).src= path + icon(get('img' + id ).src)[1];
+
+}
+
+function collapse(id){
+get('d' + id ).style.display='none';
+if(get('imgn' + id )) get('imgn' + id ).src= path + pn[pnImg(get('imgn' + id ).src)][0];
+get('img' + id ).src= path + icon(get('img' + id ).src)[0];
+
+}
+
+function collapseAll(){
+var i;
+var o;
+for(i=0;i<=divlist.length-1;i++){
+	if(o=get('d' + divlist[i])){
+		if(o.style.display!='none'){ 
+			collapse(divlist[i]);
+		}
+	}
+}
+}
+
+function showAll(){
+var i;
+var o;
+for(i=0;i<=divlist.length-1;i++){
+	if(o=get('d' + divlist[i])){
+		if(o.style.display!='block'){ 
+			show(divlist[i]);
+		}
+	}
+}
+}
+
+function unselectAll(){
+var i=0;
+while(get("l" + i)){
+	get("l" + i).className = "unselected";
+	i++;
+}
+}
+
+function clickNode(index){
+var e;
+
+e = get("l" + index);
+if(e==null) return;
+e = e.parentNode;
+if(e.nodeName == 'A'){
+	if(e.href!= window.location.href + '#'){
+		parent.parent.content.location.href = e.href;
+	}else{
+		selectNode(index);
+	}
+	e.onclick;
+}
+}
+
+function showParent(ele){
+var e;
+e = ele.parentNode;
+
+if(e==null) return;
+
+if(e.nodeName == 'DIV'){
+	if(e.id!='') show(e.id.substring(1,e.id.length ));
+}else if(e.nodeName == 'A'){
+
+}
+showParent(e);
+}
+
+function showNode(index){
+showParent(get("l" + index));
+LinkClick(index);
+}
+
+function selectNode(index){
+if(LastSelected!=index){
+//collapseAll();
+showParent(get("l" + index));
+LinkClick(index);
+get('l' + index).scrollIntoView(true);
+
+
+//alert(get('l' + index).offsetHeight + '|' + document.body.clientHeight + '|' + document.body.offsetHeight);
+window.scrollTo(0,document.body.scrollTop); // - document.body.clientHeight /3);
+}
+}
+
+
+function NodeClick(id){
+if(get('d' + id ).style.display=='none'){
+	show(id);
+}else{
+	collapse(id);
+}
+return false;
+}
+
+function LinkDblClick(id){
+if(!AutoCollapse){
+	if(get('d' + id ).style.display=='none'){
+		show(id);
+	}else{
+		collapse(id);
+	}
+}
+return false;
+}
+
+function LinkClick(index,hasChild,r){
+if(AutoCollapse && hasChild){
+	if(get('d' + index ).style.display=='none'){
+		collapseAll()
+		showParent(get('l' + index));
+		show(index);
+	}else{
+		collapseAll()
+		showParent(get('l' + index));	
+		collapse(index);
+	}
+}
+if(LastSelected!=-1){
+	get('l' + LastSelected).className = "unselected";
+}
+get('l' + index).className = "selected";
+LastSelected = index;
+return r;
+}
+
+function body_onmousemove(event){
+if(typeof(document.body.scrollTop)!='undefined'){
+if(parseInt(event.clientX)<5){
+window.scroll(0,document.body.scrollTop);}}
+if(typeof(window.scrollY)!='undefined'){
+if(parseInt(event.clientX)<5){
+window.scrollTo(0,window.scrollY);}}
+}
+
+window.defaultStatus = '';
+
+function body_onload(){
+get('loading').style.display='none';
+loaded = true;
+if(parent.parent.content.document.readyState){
+	if(parent.parent.content.document.readyState == 'complete'){
+		try{parent.parent.content.syn();}catch(e){};
+	}
+}else{
+	if(parent.parent.contentLoaded){
+		try{parent.parent.content.syn();}catch(e){};
+	}
+}
+}
+
+//-->
+</SCRIPT>
+<script language="JavaScript" src="languages.js"></script>
+
+</head>
+
+<body bgcolor="#ffffff" leftmargin="5" topmargin="5" marginwidth="5" marginheight="5" onmousemove="body_onmousemove(event);" onload="body_onload();">
+<div id="loading"><font color="#FF0000" size="1"> Loading table of contents... 
+</font><br><br></div>
+<script>SetEnv(0,true)</script><div><nobr><img src="icons/downangle.gif" class="p"><a href="topics/a_cover.htm" onclick="return LinkClick('0',false,true)" target="content" title="COVER IPMS" onmousemove="window.status='COVER IPMS'"><img src="icons/11.gif" class="p"> <span id="l0" class="unselected">COVER IPMS</span></a></nobr></div>
+<div><nobr><img src="icons/tshaped.gif" class="p"><a href="topics/Pendahuluan_Side_Bar_Manu_IPMS.htm" onclick="return LinkClick('1',false,true)" target="content" title="SIDE BAR MENU IPMS" onmousemove="window.status='SIDE BAR MENU IPMS'"><img src="icons/11.gif" class="p"> <span id="l1" class="unselected">SIDE BAR MENU IPMS</span></a></nobr></div>
+<div><nobr><img src="icons/tshaped.gif" class="p"><a href="topics/Indeks.htm" onclick="return LinkClick('2',false,true)" target="content" title="INDEX" onmousemove="window.status='INDEX'"><img src="icons/11.gif" class="p"> <span id="l2" class="unselected">INDEX</span></a></nobr></div>
+<div><nobr><a href="#" onClick="return NodeClick('3')"><img id="imgn3" src="icons/tplus.gif" class="p"></a><a href="topics/PENDAHULUAN.htm" onclick="return LinkClick('3',true,true)" onDblClick="return LinkDblClick('3')" target="content" title="PENDAHULUAN" onmousemove="window.status='PENDAHULUAN'"><img id="img3" src="icons/1.gif" class="p"> <span id="l3" class="unselected">PENDAHULUAN</span></a></nobr></div>
+<div id="d3" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Pendahuluan - Pengantar.htm" onclick="return LinkClick('4',false,true)" target="content" title="PENGANTAR" onmousemove="window.status='PENGANTAR'"><img src="icons/11.gif" class="p"> <span id="l4" class="unselected">PENGANTAR</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/a_Help ver 1.0.1.htm" onclick="return LinkClick('5',false,true)" target="content" title="HELP" onmousemove="window.status='HELP'"><img src="icons/11.gif" class="p"> <span id="l5" class="unselected">HELP</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Pendahuluan - Credit.htm" onclick="return LinkClick('6',false,true)" target="content" title="PLATFORM" onmousemove="window.status='PLATFORM'"><img src="icons/11.gif" class="p"> <span id="l6" class="unselected">PLATFORM</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('7')"><img id="imgn7" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('7',true,false)" onDblClick="return LinkDblClick('7')" target="content" title="KONSEP BUDGET, BUASO &amp; REVENUE CODE" onmousemove="window.status='KONSEP BUDGET, BUASO &amp; REVENUE CODE'"><img id="img7" src="icons/1.gif" class="p"> <span id="l7" class="unselected">KONSEP BUDGET, BUASO &amp; REVENUE CODE</span></a></nobr></div>
+<div id="d7" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/DEFINISI_BUDGET.htm" onclick="return LinkClick('8',false,true)" target="content" title="DEFINISI BUDGET" onmousemove="window.status='DEFINISI BUDGET'"><img src="icons/11.gif" class="p"> <span id="l8" class="unselected">DEFINISI BUDGET</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Summary Budget - Terminologi_Budget.htm" onclick="return LinkClick('9',false,true)" target="content" title="TERMINOLOGY BUDGET" onmousemove="window.status='TERMINOLOGY BUDGET'"><img src="icons/11.gif" class="p"> <span id="l9" class="unselected">TERMINOLOGY BUDGET</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Summary_Budget_Buaso_Code1.htm" onclick="return LinkClick('10',false,true)" target="content" title="BUASO  CODE" onmousemove="window.status='BUASO  CODE'"><img src="icons/11.gif" class="p"> <span id="l10" class="unselected">BUASO  CODE</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Summary_Budget_Revenue_Code.htm" onclick="return LinkClick('11',false,true)" target="content" title="REVENUE CODE" onmousemove="window.status='REVENUE CODE'"><img src="icons/11.gif" class="p"> <span id="l11" class="unselected">REVENUE CODE</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('12')"><img id="imgn12" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('12',true,false)" onDblClick="return LinkDblClick('12')" target="content" title="PROSEDUR PROYEK BARU (PEMBUATAN KAMAR PROYEK DI IPMS)" onmousemove="window.status='PROSEDUR PROYEK BARU (PEMBUATAN KAMAR PROYEK DI IPMS)'"><img id="img12" src="icons/1.gif" class="p"> <span id="l12" class="unselected">PROSEDUR PROYEK BARU (PEMBUATAN KAMAR PROYEK DI IPMS)</span></a></nobr></div>
+<div id="d12" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/TAHAPAN_REGISTRASI_PROYEK.htm" onclick="return LinkClick('13',false,true)" target="content" title="TAHAPAN REGISTRASI PROYEK" onmousemove="window.status='TAHAPAN REGISTRASI PROYEK'"><img src="icons/11.gif" class="p"> <span id="l13" class="unselected">TAHAPAN REGISTRASI PROYEK</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/PERSIAPAN_DATA_BUDGET.htm" onclick="return LinkClick('14',false,true)" target="content" title="PERSIAPAN DATA BUDGET" onmousemove="window.status='PERSIAPAN DATA BUDGET'"><img src="icons/11.gif" class="p"> <span id="l14" class="unselected">PERSIAPAN DATA BUDGET</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/UPLOAD_DATA_NEW_PROJECT.htm" onclick="return LinkClick('15',false,true)" target="content" title="UPLOAD DATA NEW PROJECT" onmousemove="window.status='UPLOAD DATA NEW PROJECT'"><img src="icons/11.gif" class="p"> <span id="l15" class="unselected">UPLOAD DATA NEW PROJECT</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Prosedure_REGISTRASI_IPMS.htm" onclick="return LinkClick('16',false,true)" target="content" title="REGISTRASI IPMS &amp; VALIDASI LPP" onmousemove="window.status='REGISTRASI IPMS &amp; VALIDASI LPP'"><img src="icons/11.gif" class="p"> <span id="l16" class="unselected">REGISTRASI IPMS &amp; VALIDASI LPP</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('17')"><img id="imgn17" src="icons/tplus.gif" class="p"></a><a href="topics/DASHBOARD.htm" onclick="return LinkClick('17',true,true)" onDblClick="return LinkDblClick('17')" target="content" title="DASHBOARD" onmousemove="window.status='DASHBOARD'"><img id="img17" src="icons/1.gif" class="p"> <span id="l17" class="unselected">DASHBOARD</span></a></nobr></div>
+<div id="d17" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Dashboard_Budget.htm" onclick="return LinkClick('18',false,true)" target="content" title="DASHBOARD BUDGET" onmousemove="window.status='DASHBOARD BUDGET'"><img src="icons/11.gif" class="p"> <span id="l18" class="unselected">DASHBOARD BUDGET</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Dashboard Transaction.htm" onclick="return LinkClick('19',false,true)" target="content" title="DASHBOARD TRANSACTION" onmousemove="window.status='DASHBOARD TRANSACTION'"><img src="icons/11.gif" class="p"> <span id="l19" class="unselected">DASHBOARD TRANSACTION</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Dashboard_Akuntansi_Management.htm" onclick="return LinkClick('20',false,true)" target="content" title="DASHBOARD AKUNTANSI MANAGEMENT" onmousemove="window.status='DASHBOARD AKUNTANSI MANAGEMENT'"><img src="icons/11.gif" class="p"> <span id="l20" class="unselected">DASHBOARD AKUNTANSI MANAGEMENT</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Dashboard_Cash_Flow.htm" onclick="return LinkClick('21',false,true)" target="content" title="DASHBOARD CASH FLOW" onmousemove="window.status='DASHBOARD CASH FLOW'"><img src="icons/11.gif" class="p"> <span id="l21" class="unselected">DASHBOARD CASH FLOW</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('22')"><img id="imgn22" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('22',true,false)" onDblClick="return LinkDblClick('22')" target="content" title="SUMMARY BUDGET" onmousemove="window.status='SUMMARY BUDGET'"><img id="img22" src="icons/1.gif" class="p"> <span id="l22" class="unselected">SUMMARY BUDGET</span></a></nobr></div>
+<div id="d22" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('23')"><img id="imgn23" src="icons/tplus.gif" class="p"></a><a href="topics/Prosedure_PENGAJUAN_BUDGET.htm" onclick="return LinkClick('23',true,true)" onDblClick="return LinkDblClick('23')" target="content" title="PENGERTIAN ALOKASI BUDGET" onmousemove="window.status='PENGERTIAN ALOKASI BUDGET'"><img id="img23" src="icons/1.gif" class="p"> <span id="l23" class="unselected">PENGERTIAN ALOKASI BUDGET</span></a></nobr></div>
+<div id="d23" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Alokasi_Budget_VARIATION_ORDER.htm" onclick="return LinkClick('24',false,true)" target="content" title="Alokasi VARIATION ORDER" onmousemove="window.status='Alokasi VARIATION ORDER'"><img src="icons/11.gif" class="p"> <span id="l24" class="unselected">Alokasi VARIATION ORDER</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Alokasi_REVIEW_BUDGET.htm" onclick="return LinkClick('25',false,true)" target="content" title="Alokasi REVIEW BUDGET" onmousemove="window.status='Alokasi REVIEW BUDGET'"><img src="icons/11.gif" class="p"> <span id="l25" class="unselected">Alokasi REVIEW BUDGET</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Alokasi_MISS_CALCULATE.htm" onclick="return LinkClick('26',false,true)" target="content" title="Alokasi MISS CALCULATE" onmousemove="window.status='Alokasi MISS CALCULATE'"><img src="icons/11.gif" class="p"> <span id="l26" class="unselected">Alokasi MISS CALCULATE</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Alokasi_POTENTIAL_CHANGE_ORDER.htm" onclick="return LinkClick('27',false,true)" target="content" title="Alokasi POTENTIAL CHANGE ORDER" onmousemove="window.status='Alokasi POTENTIAL CHANGE ORDER'"><img src="icons/11.gif" class="p"> <span id="l27" class="unselected">Alokasi POTENTIAL CHANGE ORDER</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Alokasi_TAMBAH___KURANGKAN_UNCOMMITTED_COST.htm" onclick="return LinkClick('28',false,true)" target="content" title="Alokasi TAMBAH / KURANGKAN UNCOMMITTED COST" onmousemove="window.status='Alokasi TAMBAH / KURANGKAN UNCOMMITTED COST'"><img src="icons/11.gif" class="p"> <span id="l28" class="unselected">Alokasi TAMBAH / KURANGKAN UNCOMMITTED COST</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Alokasi_NOL_KAN_UNCOMMITTED_COST.htm" onclick="return LinkClick('29',false,true)" target="content" title="Alokasi NOL KAN UNCOMMITTED COST" onmousemove="window.status='Alokasi NOL KAN UNCOMMITTED COST'"><img src="icons/11.gif" class="p"> <span id="l29" class="unselected">Alokasi NOL KAN UNCOMMITTED COST</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('30')"><img id="imgn30" src="icons/tplus.gif" class="p"></a><a href="topics/Pembuatan_Budget.htm" onclick="return LinkClick('30',true,true)" onDblClick="return LinkDblClick('30')" target="content" title="FLOW UPLOAD DAN REVISI BUDGET" onmousemove="window.status='FLOW UPLOAD DAN REVISI BUDGET'"><img id="img30" src="icons/1.gif" class="p"> <span id="l30" class="unselected">FLOW UPLOAD DAN REVISI BUDGET</span></a></nobr></div>
+<div id="d30" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('31')"><img id="imgn31" src="icons/uaplus.gif" class="p"></a><a href="topics/Summary_Budget_Edit___Tambah_Budget.htm" onclick="return LinkClick('31',true,true)" onDblClick="return LinkDblClick('31')" target="content" title="Edit / Tambah Budget" onmousemove="window.status='Edit / Tambah Budget'"><img id="img31" src="icons/1.gif" class="p"> <span id="l31" class="unselected">Edit / Tambah Budget</span></a></nobr></div>
+<div id="d31" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Edit_Budget_Tambah_Budget_Baru.htm" onclick="return LinkClick('32',false,true)" target="content" title="Tambah Budget Baru" onmousemove="window.status='Tambah Budget Baru'"><img src="icons/11.gif" class="p"> <span id="l32" class="unselected">Tambah Budget Baru</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Edit_Budget_Alokasi_Original_Budget.htm" onclick="return LinkClick('33',false,true)" target="content" title="Alokasi Original Budget" onmousemove="window.status='Alokasi Original Budget'"><img src="icons/11.gif" class="p"> <span id="l33" class="unselected">Alokasi Original Budget</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Edit_Budget_Alokasi_Over_Budget.htm" onclick="return LinkClick('34',false,true)" target="content" title="Alokasi Over Budget" onmousemove="window.status='Alokasi Over Budget'"><img src="icons/11.gif" class="p"> <span id="l34" class="unselected">Alokasi Over Budget</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Edit_Budget_Alokasi_Uncommitted_Cost.htm" onclick="return LinkClick('35',false,true)" target="content" title="Alokasi Uncommitted Cost" onmousemove="window.status='Alokasi Uncommitted Cost'"><img src="icons/11.gif" class="p"> <span id="l35" class="unselected">Alokasi Uncommitted Cost</span></a></nobr></div>
+</div></div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Budget_Awal_IPMS_Tanpa_List_Sort.htm" onclick="return LinkClick('36',false,true)" target="content" title="Tanpa List Sort" onmousemove="window.status='Tanpa List Sort'"><img src="icons/11.gif" class="p"> <span id="l36" class="unselected">Tanpa List Sort</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Budget_Awal_IPMS_Berdasarkan_List_Sort.htm" onclick="return LinkClick('37',false,true)" target="content" title="Berdasarkan List Sort" onmousemove="window.status='Berdasarkan List Sort'"><img src="icons/11.gif" class="p"> <span id="l37" class="unselected">Berdasarkan List Sort</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Summary_Budget_Tombol_Rekalkulasi_Budget.htm" onclick="return LinkClick('38',false,true)" target="content" title="Tombol Rekalkulasi Budget" onmousemove="window.status='Tombol Rekalkulasi Budget'"><img src="icons/11.gif" class="p"> <span id="l38" class="unselected">Tombol Rekalkulasi Budget</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/" onclick="return LinkClick('39',false,true)" target="content" title="Budget Awal IPMS" onmousemove="window.status='Budget Awal IPMS'"><img src="icons/11.gif" class="p"> <span id="l39" class="unselected">Budget Awal IPMS</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('40')"><img id="imgn40" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('40',true,false)" onDblClick="return LinkDblClick('40')" target="content" title="MEMBUAT BUASO CODE" onmousemove="window.status='MEMBUAT BUASO CODE'"><img id="img40" src="icons/1.gif" class="p"> <span id="l40" class="unselected">MEMBUAT BUASO CODE</span></a></nobr></div>
+<div id="d40" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Summary_Budget_Buaso_Upload_Dari_List_Sort.htm" onclick="return LinkClick('41',false,true)" target="content" title="Upload Dari List Sort" onmousemove="window.status='Upload Dari List Sort'"><img src="icons/11.gif" class="p"> <span id="l41" class="unselected">Upload Dari List Sort</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Summary_Budget_Buaso_Menambah_Edit_BUASO.htm" onclick="return LinkClick('42',false,true)" target="content" title="Menambah / Edit BUASO" onmousemove="window.status='Menambah / Edit BUASO'"><img src="icons/11.gif" class="p"> <span id="l42" class="unselected">Menambah / Edit BUASO</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Summary_Budget_Buaso_BUASO_Otomatis_Dari_PR.htm" onclick="return LinkClick('43',false,true)" target="content" title="BUASO Otomatis Dari PR" onmousemove="window.status='BUASO Otomatis Dari PR'"><img src="icons/11.gif" class="p"> <span id="l43" class="unselected">BUASO Otomatis Dari PR</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/SUmmary_Budget_MEMBUAT_REVENUE_CODE.htm" onclick="return LinkClick('44',false,true)" target="content" title="MEMBUAT REVENUE CODE" onmousemove="window.status='MEMBUAT REVENUE CODE'"><img src="icons/11.gif" class="p"> <span id="l44" class="unselected">MEMBUAT REVENUE CODE</span></a></nobr></div>
+</div><div><nobr><img src="icons/tshaped.gif" class="p"><a href="topics/SELECT_PROYEK.htm" onclick="return LinkClick('45',false,true)" target="content" title="SELECT PROJECT" onmousemove="window.status='SELECT PROJECT'"><img src="icons/11.gif" class="p"> <span id="l45" class="unselected">SELECT PROJECT</span></a></nobr></div>
+<div><nobr><a href="#" onClick="return NodeClick('46')"><img id="imgn46" src="icons/tplus.gif" class="p"></a><a href="topics/USER_PROFIL.htm" onclick="return LinkClick('46',true,true)" onDblClick="return LinkDblClick('46')" target="content" title="USER PROFIL" onmousemove="window.status='USER PROFIL'"><img id="img46" src="icons/1.gif" class="p"> <span id="l46" class="unselected">USER PROFIL</span></a></nobr></div>
+<div id="d46" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/User Profil - My_Profile.htm" onclick="return LinkClick('47',false,true)" target="content" title="MY PROFILE" onmousemove="window.status='MY PROFILE'"><img src="icons/11.gif" class="p"> <span id="l47" class="unselected">MY PROFILE</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/User Profil - TJS_Discussion.htm" onclick="return LinkClick('48',false,true)" target="content" title="TJS DISCUSSION" onmousemove="window.status='TJS DISCUSSION'"><img src="icons/11.gif" class="p"> <span id="l48" class="unselected">TJS DISCUSSION</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/User Profile - Ganti_Password.htm" onclick="return LinkClick('49',false,true)" target="content" title="GANTI PASSWORD" onmousemove="window.status='GANTI PASSWORD'"><img src="icons/11.gif" class="p"> <span id="l49" class="unselected">GANTI PASSWORD</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/User Profile - Ganti_User_Name.htm" onclick="return LinkClick('50',false,true)" target="content" title="GANTI USER NAME" onmousemove="window.status='GANTI USER NAME'"><img src="icons/11.gif" class="p"> <span id="l50" class="unselected">GANTI USER NAME</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/01 User Profil - Logout.htm" onclick="return LinkClick('51',false,true)" target="content" title="LOGOUT" onmousemove="window.status='LOGOUT'"><img src="icons/11.gif" class="p"> <span id="l51" class="unselected">LOGOUT</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('52')"><img id="imgn52" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('52',true,false)" onDblClick="return LinkDblClick('52')" target="content" title="REQUISITION" onmousemove="window.status='REQUISITION'"><img id="img52" src="icons/1.gif" class="p"> <span id="l52" class="unselected">REQUISITION</span></a></nobr></div>
+<div id="d52" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Requisition_PO_CATALOGUE.htm" onclick="return LinkClick('53',false,true)" target="content" title="PO CATALOGUE" onmousemove="window.status='PO CATALOGUE'"><img src="icons/11.gif" class="p"> <span id="l53" class="unselected">PO CATALOGUE</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/REQUISITION_Purchase_Requisition.htm" onclick="return LinkClick('54',false,true)" target="content" title="PURCHASE REQUISITION" onmousemove="window.status='PURCHASE REQUISITION'"><img src="icons/11.gif" class="p"> <span id="l54" class="unselected">PURCHASE REQUISITION</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Requisition_SR_PRODUKSI.htm" onclick="return LinkClick('55',false,true)" target="content" title="SR PRODUKSI" onmousemove="window.status='SR PRODUKSI'"><img src="icons/11.gif" class="p"> <span id="l55" class="unselected">SR PRODUKSI</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Requisition_StTOCK_REQUISITION.htm" onclick="return LinkClick('56',false,true)" target="content" title="StTOCK REQUISITION" onmousemove="window.status='StTOCK REQUISITION'"><img src="icons/11.gif" class="p"> <span id="l56" class="unselected">StTOCK REQUISITION</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Requisition_SR_SISA.htm" onclick="return LinkClick('57',false,true)" target="content" title="SR SISA" onmousemove="window.status='SR SISA'"><img src="icons/11.gif" class="p"> <span id="l57" class="unselected">SR SISA</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('58')"><img id="imgn58" src="icons/tplus.gif" class="p"></a><a href="topics/CONTRACT_Contract.htm" onclick="return LinkClick('58',true,true)" onDblClick="return LinkDblClick('58')" target="content" title="CONTRACT &amp; PO" onmousemove="window.status='CONTRACT &amp; PO'"><img id="img58" src="icons/1.gif" class="p"> <span id="l58" class="unselected">CONTRACT &amp; PO</span></a></nobr></div>
+<div id="d58" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('59')"><img id="imgn59" src="icons/tplus.gif" class="p"></a><a href="topics/CONTRACT_Contract.htm" onclick="return LinkClick('59',true,true)" onDblClick="return LinkDblClick('59')" target="content" title="CONTRACT MANDOR / SUB" onmousemove="window.status='CONTRACT MANDOR / SUB'"><img id="img59" src="icons/1.gif" class="p"> <span id="l59" class="unselected">CONTRACT MANDOR / SUB</span></a></nobr></div>
+<div id="d59" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Contract_Membuat_Contract.htm" onclick="return LinkClick('60',false,true)" target="content" title="Membuat Contract" onmousemove="window.status='Membuat Contract'"><img src="icons/11.gif" class="p"> <span id="l60" class="unselected">Membuat Contract</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Contract_Input_Detail_Secara_Manual.htm" onclick="return LinkClick('61',false,true)" target="content" title="Input Detail Secara Manual" onmousemove="window.status='Input Detail Secara Manual'"><img src="icons/11.gif" class="p"> <span id="l61" class="unselected">Input Detail Secara Manual</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Contract_Import_Template_Contract.htm" onclick="return LinkClick('62',false,true)" target="content" title="Import Template Contract" onmousemove="window.status='Import Template Contract'"><img src="icons/11.gif" class="p"> <span id="l62" class="unselected">Import Template Contract</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Contract_Contract_Owner.htm" onclick="return LinkClick('63',false,true)" target="content" title="CONTRACT OWNER" onmousemove="window.status='CONTRACT OWNER'"><img src="icons/11.gif" class="p"> <span id="l63" class="unselected">CONTRACT OWNER</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('64')"><img id="imgn64" src="icons/uaplus.gif" class="p"></a><a href="#" onclick="return LinkClick('64',true,false)" onDblClick="return LinkDblClick('64')" target="content" title="PO/DO/PO CASH" onmousemove="window.status='PO/DO/PO CASH'"><img id="img64" src="icons/1.gif" class="p"> <span id="l64" class="unselected">PO/DO/PO CASH</span></a></nobr></div>
+<div id="d64" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Purchasing_PURCHASE_ORDER.htm" onclick="return LinkClick('65',false,true)" target="content" title="PURCHASE ORDER" onmousemove="window.status='PURCHASE ORDER'"><img src="icons/11.gif" class="p"> <span id="l65" class="unselected">PURCHASE ORDER</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Purchasing_PO_CASH.htm" onclick="return LinkClick('66',false,true)" target="content" title="PO CASH" onmousemove="window.status='PO CASH'"><img src="icons/11.gif" class="p"> <span id="l66" class="unselected">PO CASH</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Purchasing_DELIVERY_ORDER.htm" onclick="return LinkClick('67',false,true)" target="content" title="DELIVERY ORDER" onmousemove="window.status='DELIVERY ORDER'"><img src="icons/11.gif" class="p"> <span id="l67" class="unselected">DELIVERY ORDER</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Purchasing_DO_PRODUKSI.htm" onclick="return LinkClick('68',false,true)" target="content" title="DO PRODUKSI" onmousemove="window.status='DO PRODUKSI'"><img src="icons/11.gif" class="p"> <span id="l68" class="unselected">DO PRODUKSI</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Purchasing_DO_SISA.htm" onclick="return LinkClick('69',false,true)" target="content" title="DO SISA" onmousemove="window.status='DO SISA'"><img src="icons/11.gif" class="p"> <span id="l69" class="unselected">DO SISA</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/blank.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Purchasing_PO_TANPA_PR.htm" onclick="return LinkClick('70',false,true)" target="content" title="PO TANPA PR" onmousemove="window.status='PO TANPA PR'"><img src="icons/11.gif" class="p"> <span id="l70" class="unselected">PO TANPA PR</span></a></nobr></div>
+</div></div><div><nobr><a href="#" onClick="return NodeClick('71')"><img id="imgn71" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('71',true,false)" onDblClick="return LinkDblClick('71')" target="content" title="INVOICING" onmousemove="window.status='INVOICING'"><img id="img71" src="icons/1.gif" class="p"> <span id="l71" class="unselected">INVOICING</span></a></nobr></div>
+<div id="d71" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('72')"><img id="imgn72" src="icons/tplus.gif" class="p"></a><a href="topics/INVOICING_Invoice_Contract.htm" onclick="return LinkClick('72',true,true)" onDblClick="return LinkDblClick('72')" target="content" title="INCVOICE CONTRACT MANDOR / SUB" onmousemove="window.status='INCVOICE CONTRACT MANDOR / SUB'"><img id="img72" src="icons/1.gif" class="p"> <span id="l72" class="unselected">INCVOICE CONTRACT MANDOR / SUB</span></a></nobr></div>
+<div id="d72" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Invoicing_Contract_Membuat_Invoice_Contract.htm" onclick="return LinkClick('73',false,true)" target="content" title="Membuat Invoice Contract" onmousemove="window.status='Membuat Invoice Contract'"><img src="icons/11.gif" class="p"> <span id="l73" class="unselected">Membuat Invoice Contract</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Invoicing_Contract_Pengajuan_Down_Payment_Untuk_Sub_Mandor.htm" onclick="return LinkClick('74',false,true)" target="content" title="Pengajuan Down Payment Untuk Sub/Mandor" onmousemove="window.status='Pengajuan Down Payment Untuk Sub/Mandor'"><img src="icons/11.gif" class="p"> <span id="l74" class="unselected">Pengajuan Down Payment Untuk Sub/Mandor</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('75')"><img id="imgn75" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('75',true,false)" onDblClick="return LinkDblClick('75')" target="content" title="Pengajuan Kasbon" onmousemove="window.status='Pengajuan Kasbon'"><img id="img75" src="icons/1.gif" class="p"> <span id="l75" class="unselected">Pengajuan Kasbon</span></a></nobr></div>
+<div id="d75" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Invoicing_Contract_Pengajuan_Kasbon_Tanpa_Progress.htm" onclick="return LinkClick('76',false,true)" target="content" title="Pengajuan Kasbon Tanpa Progress" onmousemove="window.status='Pengajuan Kasbon Tanpa Progress'"><img src="icons/11.gif" class="p"> <span id="l76" class="unselected">Pengajuan Kasbon Tanpa Progress</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Invoicing_Contract_Pengajuan_Kasbon_Dengan_Progress_Item.htm" onclick="return LinkClick('77',false,true)" target="content" title="Pengajuan Kasbon Dengan Progress Item" onmousemove="window.status='Pengajuan Kasbon Dengan Progress Item'"><img src="icons/11.gif" class="p"> <span id="l77" class="unselected">Pengajuan Kasbon Dengan Progress Item</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Invoicing_Contract_Pengajuan_Retensi.htm" onclick="return LinkClick('78',false,true)" target="content" title="Pengajuan Retensi" onmousemove="window.status='Pengajuan Retensi'"><img src="icons/11.gif" class="p"> <span id="l78" class="unselected">Pengajuan Retensi</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('79')"><img id="imgn79" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('79',true,false)" onDblClick="return LinkDblClick('79')" target="content" title="INVOICE CONTRACT OWNER" onmousemove="window.status='INVOICE CONTRACT OWNER'"><img id="img79" src="icons/1.gif" class="p"> <span id="l79" class="unselected">INVOICE CONTRACT OWNER</span></a></nobr></div>
+<div id="d79" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Invoicing_Contract_Owner_Membuat_Invoice_Pendapatan.htm" onclick="return LinkClick('80',false,true)" target="content" title="Membuat Invoice Pendapatan" onmousemove="window.status='Membuat Invoice Pendapatan'"><img src="icons/11.gif" class="p"> <span id="l80" class="unselected">Membuat Invoice Pendapatan</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Invoicing_Contract_Owner_Pengajuan_Down_Payment_Ke_Owner.htm" onclick="return LinkClick('81',false,true)" target="content" title="Pengajuan Down Payment Ke Owner" onmousemove="window.status='Pengajuan Down Payment Ke Owner'"><img src="icons/11.gif" class="p"> <span id="l81" class="unselected">Pengajuan Down Payment Ke Owner</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Invoicing_Contract_Owner_Membuat_Invoice_Untuk_LPP.htm" onclick="return LinkClick('82',false,true)" target="content" title="Membuat Invoice Untuk LPP" onmousemove="window.status='Membuat Invoice Untuk LPP'"><img src="icons/11.gif" class="p"> <span id="l82" class="unselected">Membuat Invoice Untuk LPP</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Ivoicing_INDIRECT_COST.htm" onclick="return LinkClick('83',false,true)" target="content" title="INDIRECT COST" onmousemove="window.status='INDIRECT COST'"><img src="icons/11.gif" class="p"> <span id="l83" class="unselected">INDIRECT COST</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Ivoicing_PENGAJUAN_BIAYA.htm" onclick="return LinkClick('84',false,true)" target="content" title="PENGAJUAN BIAYA" onmousemove="window.status='PENGAJUAN BIAYA'"><img src="icons/11.gif" class="p"> <span id="l84" class="unselected">PENGAJUAN BIAYA</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Ivoicing_PENGAJUAN_GAJI.htm" onclick="return LinkClick('85',false,true)" target="content" title="PENGAJUAN GAJI" onmousemove="window.status='PENGAJUAN GAJI'"><img src="icons/11.gif" class="p"> <span id="l85" class="unselected">PENGAJUAN GAJI</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Ivoicing_PENGAJUAN_BPJS.htm" onclick="return LinkClick('86',false,true)" target="content" title="PENGAJUAN BPJS" onmousemove="window.status='PENGAJUAN BPJS'"><img src="icons/11.gif" class="p"> <span id="l86" class="unselected">PENGAJUAN BPJS</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Ivoicing_INVOICE_PEMBEBANAN.htm" onclick="return LinkClick('87',false,true)" target="content" title="INVOICE PEMBEBANAN" onmousemove="window.status='INVOICE PEMBEBANAN'"><img src="icons/11.gif" class="p"> <span id="l87" class="unselected">INVOICE PEMBEBANAN</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Ivoicing_INVOICE_BPJS.htm" onclick="return LinkClick('88',false,true)" target="content" title="INVOICE BPJS" onmousemove="window.status='INVOICE BPJS'"><img src="icons/11.gif" class="p"> <span id="l88" class="unselected">INVOICE BPJS</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/ADUSTMENT_CASH_FLOW.htm" onclick="return LinkClick('89',false,true)" target="content" title="ADUSTMENT CASH FLOW" onmousemove="window.status='ADUSTMENT CASH FLOW'"><img src="icons/11.gif" class="p"> <span id="l89" class="unselected">ADUSTMENT CASH FLOW</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('90')"><img id="imgn90" src="icons/tplus.gif" class="p"></a><a href="topics/INVENTORY_Monitoring_PO_DO.htm" onclick="return LinkClick('90',true,true)" onDblClick="return LinkDblClick('90')" target="content" title="INVENTORY" onmousemove="window.status='INVENTORY'"><img id="img90" src="icons/1.gif" class="p"> <span id="l90" class="unselected">INVENTORY</span></a></nobr></div>
+<div id="d90" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/INVENTORY_Monitoring_PO_DO.htm" onclick="return LinkClick('91',false,true)" target="content" title="MONITORING PO/DO" onmousemove="window.status='MONITORING PO/DO'"><img src="icons/11.gif" class="p"> <span id="l91" class="unselected">MONITORING PO/DO</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Inventory_STOCK_CARD_NOTA_MERAH.htm" onclick="return LinkClick('92',false,true)" target="content" title="STOCK CARD NOTA MERAH" onmousemove="window.status='STOCK CARD NOTA MERAH'"><img src="icons/11.gif" class="p"> <span id="l92" class="unselected">STOCK CARD NOTA MERAH</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/APB_Pembuatan_APB.htm" onclick="return LinkClick('93',false,true)" target="content" title="APLIKASI PENERIMAAN BARANG" onmousemove="window.status='APLIKASI PENERIMAAN BARANG'"><img src="icons/11.gif" class="p"> <span id="l93" class="unselected">APLIKASI PENERIMAAN BARANG</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Inventory_STOCK_OPNAME.htm" onclick="return LinkClick('94',false,true)" target="content" title="STOCK OPNAME" onmousemove="window.status='STOCK OPNAME'"><img src="icons/11.gif" class="p"> <span id="l94" class="unselected">STOCK OPNAME</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Inventory_PENGEMBALIAN.htm" onclick="return LinkClick('95',false,true)" target="content" title="PENGEMBALIAN" onmousemove="window.status='PENGEMBALIAN'"><img src="icons/11.gif" class="p"> <span id="l95" class="unselected">PENGEMBALIAN</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Inventory_ARSIP_SERTFIKAT.htm" onclick="return LinkClick('96',false,true)" target="content" title="ARSIP SERTFIKAT" onmousemove="window.status='ARSIP SERTFIKAT'"><img src="icons/11.gif" class="p"> <span id="l96" class="unselected">ARSIP SERTFIKAT</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('97')"><img id="imgn97" src="icons/tplus.gif" class="p"></a><a href="topics/REPORTING.htm" onclick="return LinkClick('97',true,true)" onDblClick="return LinkDblClick('97')" target="content" title="REPORTING" onmousemove="window.status='REPORTING'"><img id="img97" src="icons/1.gif" class="p"> <span id="l97" class="unselected">REPORTING</span></a></nobr></div>
+<div id="d97" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><a href="#" onClick="return NodeClick('98')"><img id="imgn98" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('98',true,false)" onDblClick="return LinkDblClick('98')" target="content" title="STATUS PROYEK" onmousemove="window.status='STATUS PROYEK'"><img id="img98" src="icons/1.gif" class="p"> <span id="l98" class="unselected">STATUS PROYEK</span></a></nobr></div>
+<div id="d98" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Final_Account.htm" onclick="return LinkClick('99',false,true)" target="content" title="Final Account" onmousemove="window.status='Final Account'"><img src="icons/11.gif" class="p"> <span id="l99" class="unselected">Final Account</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Carry_Over.htm" onclick="return LinkClick('100',false,true)" target="content" title="Carry Over" onmousemove="window.status='Carry Over'"><img src="icons/11.gif" class="p"> <span id="l100" class="unselected">Carry Over</span></a></nobr></div>
+</div><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/CATATAN_PENGELUARAN_PROYEK.htm" onclick="return LinkClick('101',false,true)" target="content" title="CATATAN PENGELUARAN PROYEK" onmousemove="window.status='CATATAN PENGELUARAN PROYEK'"><img src="icons/11.gif" class="p"> <span id="l101" class="unselected">CATATAN PENGELUARAN PROYEK</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/VALIDASI_LPP.htm" onclick="return LinkClick('102',false,true)" target="content" title="VALIDASI LPP" onmousemove="window.status='VALIDASI LPP'"><img src="icons/11.gif" class="p"> <span id="l102" class="unselected">VALIDASI LPP</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/EXECUTIVE_SUMMARY.htm" onclick="return LinkClick('103',false,true)" target="content" title="EXECUTIVE SUMMARY" onmousemove="window.status='EXECUTIVE SUMMARY'"><img src="icons/11.gif" class="p"> <span id="l103" class="unselected">EXECUTIVE SUMMARY</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/COST_TO_COMPLETE.htm" onclick="return LinkClick('104',false,true)" target="content" title="COST TO COMPLETE" onmousemove="window.status='COST TO COMPLETE'"><img src="icons/11.gif" class="p"> <span id="l104" class="unselected">COST TO COMPLETE</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/LIST_SORT___DATA_TEKNIS.htm" onclick="return LinkClick('105',false,true)" target="content" title="LIST SORT / DATA TEKNIS" onmousemove="window.status='LIST SORT / DATA TEKNIS'"><img src="icons/11.gif" class="p"> <span id="l105" class="unselected">LIST SORT / DATA TEKNIS</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('106')"><img id="imgn106" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('106',true,false)" onDblClick="return LinkDblClick('106')" target="content" title="INTERGRASI SIA" onmousemove="window.status='INTERGRASI SIA'"><img id="img106" src="icons/1.gif" class="p"> <span id="l106" class="unselected">INTERGRASI SIA</span></a></nobr></div>
+<div id="d106" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/APH_Pembuatan_APH.htm" onclick="return LinkClick('107',false,true)" target="content" title="APLIKASI PENGAKUAN HUTANG NOTA MERAH" onmousemove="window.status='APLIKASI PENGAKUAN HUTANG NOTA MERAH'"><img src="icons/11.gif" class="p"> <span id="l107" class="unselected">APLIKASI PENGAKUAN HUTANG NOTA MERAH</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/iNTEGRASI_sia_APLIKASI_PENGAKUAN_HUTANG_MUTASI.htm" onclick="return LinkClick('108',false,true)" target="content" title="APLIKASI PENGAKUAN HUTANG MUTASI" onmousemove="window.status='APLIKASI PENGAKUAN HUTANG MUTASI'"><img src="icons/11.gif" class="p"> <span id="l108" class="unselected">APLIKASI PENGAKUAN HUTANG MUTASI</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/iNTEGRASI_sia_PUSH_VOUCHER_PO.htm" onclick="return LinkClick('109',false,true)" target="content" title="PUSH VOUCHER PO" onmousemove="window.status='PUSH VOUCHER PO'"><img src="icons/11.gif" class="p"> <span id="l109" class="unselected">PUSH VOUCHER PO</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/iNTEGRASI_sia_BATAL_VOUCHER.htm" onclick="return LinkClick('110',false,true)" target="content" title="BATAL VOUCHER" onmousemove="window.status='BATAL VOUCHER'"><img src="icons/11.gif" class="p"> <span id="l110" class="unselected">BATAL VOUCHER</span></a></nobr></div>
+</div><div><nobr><a href="#" onClick="return NodeClick('111')"><img id="imgn111" src="icons/tplus.gif" class="p"></a><a href="#" onclick="return LinkClick('111',true,false)" onDblClick="return LinkDblClick('111')" target="content" title="RANGKUMAN PENGOPERASIAN IPMS" onmousemove="window.status='RANGKUMAN PENGOPERASIAN IPMS'"><img id="img111" src="icons/1.gif" class="p"> <span id="l111" class="unselected">RANGKUMAN PENGOPERASIAN IPMS</span></a></nobr></div>
+<div id="d111" style="display:none"><div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/01_Login_Masuk_IPMS.htm" onclick="return LinkClick('112',false,true)" target="content" title="01 Login/Masuk IPMS" onmousemove="window.status='01 Login/Masuk IPMS'"><img src="icons/11.gif" class="p"> <span id="l112" class="unselected">01 Login/Masuk IPMS</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/02_Membuat_Kontrak_Owner_.htm" onclick="return LinkClick('113',false,true)" target="content" title="02 Membuat Kontrak Owner" onmousemove="window.status='02 Membuat Kontrak Owner'"><img src="icons/11.gif" class="p"> <span id="l113" class="unselected">02 Membuat Kontrak Owner</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/03_Membuat_Invoice_Kontrak_Owner.htm" onclick="return LinkClick('114',false,true)" target="content" title="03 Membuat Invoice Kontrak Owner" onmousemove="window.status='03 Membuat Invoice Kontrak Owner'"><img src="icons/11.gif" class="p"> <span id="l114" class="unselected">03 Membuat Invoice Kontrak Owner</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_04_Membuat_Kontrak_Mandor_Subkont.htm" onclick="return LinkClick('115',false,true)" target="content" title="04 Membuat Kontrak Mandor/Subkont" onmousemove="window.status='04 Membuat Kontrak Mandor/Subkont'"><img src="icons/11.gif" class="p"> <span id="l115" class="unselected">04 Membuat Kontrak Mandor/Subkont</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_05_Membuat_Invoice_Kontrak_Mandor_Subkont.htm" onclick="return LinkClick('116',false,true)" target="content" title="05 Membuat Invoice Kontrak Mandor/Subkont" onmousemove="window.status='05 Membuat Invoice Kontrak Mandor/Subkont'"><img src="icons/11.gif" class="p"> <span id="l116" class="unselected">05 Membuat Invoice Kontrak Mandor/Subkont</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_06_Membuat_Order_Material_ke_Procurement.htm" onclick="return LinkClick('117',false,true)" target="content" title="06 Membuat Order Material ke Procurement" onmousemove="window.status='06 Membuat Order Material ke Procurement'"><img src="icons/11.gif" class="p"> <span id="l117" class="unselected">06 Membuat Order Material ke Procurement</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_07_Langkah_pembuatan_PO_(user_Procurement).htm" onclick="return LinkClick('118',false,true)" target="content" title="07 Langkah pembuatan PO (user Procurement)" onmousemove="window.status='07 Langkah pembuatan PO (user Procurement)'"><img src="icons/11.gif" class="p"> <span id="l118" class="unselected">07 Langkah pembuatan PO (user Procurement)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_08_Membuat_Order_Material_ke_Logistik_Stok.htm" onclick="return LinkClick('119',false,true)" target="content" title="08 Membuat Order Material ke Logistik Stok" onmousemove="window.status='08 Membuat Order Material ke Logistik Stok'"><img src="icons/11.gif" class="p"> <span id="l119" class="unselected">08 Membuat Order Material ke Logistik Stok</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_09_Langkah_pembuatan_DO_(user_Logistik_Stock).htm" onclick="return LinkClick('120',false,true)" target="content" title="09 Langkah pembuatan DO (user Logistik Stock)" onmousemove="window.status='09 Langkah pembuatan DO (user Logistik Stock)'"><img src="icons/11.gif" class="p"> <span id="l120" class="unselected">09 Langkah pembuatan DO (user Logistik Stock)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_10_Membuat_Pengajuan_Kas_Kecil_(Petty_Cash).htm" onclick="return LinkClick('121',false,true)" target="content" title="10 Membuat Pengajuan Kas Kecil (Petty Cash)" onmousemove="window.status='10 Membuat Pengajuan Kas Kecil (Petty Cash)'"><img src="icons/11.gif" class="p"> <span id="l121" class="unselected">10 Membuat Pengajuan Kas Kecil (Petty Cash)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/11_Membuat_Order_Peralatan_SPA_(Entitas_non_TJS).htm" onclick="return LinkClick('122',false,true)" target="content" title="11 Membuat Order Peralatan SPA (Entitas non TJS)" onmousemove="window.status='11 Membuat Order Peralatan SPA (Entitas non TJS)'"><img src="icons/11.gif" class="p"> <span id="l122" class="unselected">11 Membuat Order Peralatan SPA (Entitas non TJS)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_12.Membuat_Order_Peralatan_SPA_(Entitas_TJS).htm" onclick="return LinkClick('123',false,true)" target="content" title="12.Membuat Order Peralatan SPA (Entitas TJS)" onmousemove="window.status='12.Membuat Order Peralatan SPA (Entitas TJS)'"><img src="icons/11.gif" class="p"> <span id="l123" class="unselected">12.Membuat Order Peralatan SPA (Entitas TJS)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_13.Mencatat_Kedatangan_Material_(Tracking_Nota_Merah).htm" onclick="return LinkClick('124',false,true)" target="content" title="13.Mencatat Kedatangan Material (Tracking Nota Merah)" onmousemove="window.status='13.Mencatat Kedatangan Material (Tracking Nota Merah)'"><img src="icons/11.gif" class="p"> <span id="l124" class="unselected">13.Mencatat Kedatangan Material (Tracking Nota Merah)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_14.Membuat_APB.htm" onclick="return LinkClick('125',false,true)" target="content" title="14.Membuat APB" onmousemove="window.status='14.Membuat APB'"><img src="icons/11.gif" class="p"> <span id="l125" class="unselected">14.Membuat APB</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_15.Memonitor_Stok_Gudang_(Tracking_Barang_Keluar).htm" onclick="return LinkClick('126',false,true)" target="content" title="15.Memonitor Stok Gudang (Tracking Barang Keluar)" onmousemove="window.status='15.Memonitor Stok Gudang (Tracking Barang Keluar)'"><img src="icons/11.gif" class="p"> <span id="l126" class="unselected">15.Memonitor Stok Gudang (Tracking Barang Keluar)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_16.Memonitor_Stok_Lapangan_(Tracking_Terpasang).htm" onclick="return LinkClick('127',false,true)" target="content" title="16.Memonitor Stok Lapangan (Tracking Terpasang)" onmousemove="window.status='16.Memonitor Stok Lapangan (Tracking Terpasang)'"><img src="icons/11.gif" class="p"> <span id="l127" class="unselected">16.Memonitor Stok Lapangan (Tracking Terpasang)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_17_Membuat_Laporan_Nota_Merah_(APB_Nota_Merah).htm" onclick="return LinkClick('128',false,true)" target="content" title="17 Membuat Laporan Nota Merah (APB Nota Merah)" onmousemove="window.status='17 Membuat Laporan Nota Merah (APB Nota Merah)'"><img src="icons/11.gif" class="p"> <span id="l128" class="unselected">17 Membuat Laporan Nota Merah (APB Nota Merah)</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_18.Membuat_APH.htm" onclick="return LinkClick('129',false,true)" target="content" title="18.Membuat APH" onmousemove="window.status='18.Membuat APH'"><img src="icons/11.gif" class="p"> <span id="l129" class="unselected">18.Membuat APH</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_19.Membuat_Laporan_Proyek_(_dengan_Excel_Macro_).htm" onclick="return LinkClick('130',false,true)" target="content" title="19.Membuat Laporan Proyek ( dengan Excel Macro )" onmousemove="window.status='19.Membuat Laporan Proyek ( dengan Excel Macro )'"><img src="icons/11.gif" class="p"> <span id="l130" class="unselected">19.Membuat Laporan Proyek ( dengan Excel Macro )</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/tshaped.gif" class="p"><a href="topics/Rangkuman_20.Laporan_Catatan_Pengeluaran_Proyek.htm" onclick="return LinkClick('131',false,true)" target="content" title="20.Laporan Catatan Pengeluaran Proyek" onmousemove="window.status='20.Laporan Catatan Pengeluaran Proyek'"><img src="icons/11.gif" class="p"> <span id="l131" class="unselected">20.Laporan Catatan Pengeluaran Proyek</span></a></nobr></div>
+<div><nobr><img src="icons/line.gif" class="p"><img src="icons/upangle.gif" class="p"><a href="topics/Rangkuman_21.Laporan_Perkembangan_Proyek.htm" onclick="return LinkClick('132',false,true)" target="content" title="21.Laporan Perkembangan Proyek" onmousemove="window.status='21.Laporan Perkembangan Proyek'"><img src="icons/11.gif" class="p"> <span id="l132" class="unselected">21.Laporan Perkembangan Proyek</span></a></nobr></div>
+</div><div><nobr><img src="icons/tshaped.gif" class="p"><a href="topics/RINGKASAN_IPMS.htm" onclick="return LinkClick('133',false,true)" target="content" title="RINGKASAN IPMS" onmousemove="window.status='RINGKASAN IPMS'"><img src="icons/11.gif" class="p"> <span id="l133" class="unselected">RINGKASAN IPMS</span></a></nobr></div>
+<div><nobr><img src="icons/upangle.gif" class="p"><a href="topics/PENUTUP.htm" onclick="return LinkClick('134',false,true)" target="content" title="PENUTUP" onmousemove="window.status='PENUTUP'"><img src="icons/11.gif" class="p"> <span id="l134" class="unselected">PENUTUP</span></a></nobr></div>
+<script>divlist = [3,7,12,17,22,23,30,31,40,46,52,58,59,64,71,72,75,79,90,97,98,106,111]</script>
+</body>
+</html>
